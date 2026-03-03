@@ -130,3 +130,30 @@ class EmployeeAPITest(TestCase):
         self.assertEqual(Employee.objects.count(), 5)
         # check one item saved correctly
         self.assertTrue(Employee.objects.filter(full_name='Eve Adams').exists())
+
+    def test_bulk_create_invalid_payload(self):
+        url = reverse('employee-bulk-create')
+        # not a list
+        response = self.client.post(url, {'full_name': 'X'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('Expected a list', response.data.get('error', ''))
+
+    def test_negative_salary_validation(self):
+        emp = Employee(full_name='Bad Salary', job_title='Tester', country='Nowhere', salary=-100)
+        with self.assertRaises(Exception):
+            emp.full_clean()
+
+    def test_metrics_no_data(self):
+        # new country with no records
+        url = reverse('salary-metrics-country', args=['Atlantis'])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # all values None
+        self.assertIsNone(response.data['minimum'])
+        self.assertIsNone(response.data['maximum'])
+        self.assertIsNone(response.data['average'])
+
+        url = reverse('salary-metrics-job', args=['Ghost'])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNone(response.data['average'])
