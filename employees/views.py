@@ -22,6 +22,21 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         else:
             return 0.0
 
+    @action(detail=False, methods=['post'], url_path='bulk-create')
+    def bulk_create(self, request):
+        """Accept a list of employee objects and create them in one request."""
+        data = request.data
+        if not isinstance(data, list):
+            return Response({'error': 'Expected a list of employee objects.'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.get_serializer(data=data, many=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_bulk_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def perform_bulk_create(self, serializer):
+        # bypass ModelViewSet.create which expects single instance
+        Employee.objects.bulk_create([Employee(**item) for item in serializer.validated_data])
+
     @action(detail=True, methods=['get'], url_path='calculate-salary')
     def calculate_salary(self, request, pk=None):
         employee = self.get_object()

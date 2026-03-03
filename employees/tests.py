@@ -118,3 +118,15 @@ class EmployeeAPITest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertAlmostEqual(response.data['average'], 7000.00)
+
+    def test_bulk_create(self):
+        url = reverse('employee-bulk-create')
+        payload = [
+            {'full_name': 'Eve Adams', 'job_title': 'Designer', 'country': 'India', 'salary': '5500.00'},
+            {'full_name': 'Frank Zappa', 'job_title': 'Musician', 'country': 'USA', 'salary': '4500.00'},
+        ]
+        response = self.client.post(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Employee.objects.count(), 5)
+        # check one item saved correctly
+        self.assertTrue(Employee.objects.filter(full_name='Eve Adams').exists())
