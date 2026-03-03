@@ -100,3 +100,15 @@ Response examples:
 - A SQLite database is used by default (`db.sqlite3` in the project root).
 - The `rest_framework` package is required.
 - Feel free to extend the logic or add authentication as needed.
+
+## Testing
+
+Automated tests are provided for the `employees` app covering CRUD operations, salary calculations and metrics.
+
+Run them with:
+
+```bash
+python manage.py test employees
+```
+
+Make sure migrations have been applied before running tests (the test runner will create its own in-memory database by default).
