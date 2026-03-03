@@ -43,6 +43,7 @@ All endpoints are prefixed with `/api/`.
 
 - `GET /api/employees/` - list all employees
 - `POST /api/employees/` - create a new employee
+- `POST /api/employees/bulk-create/` - create multiple employees in one request (expects JSON list)
 - `GET /api/employees/{id}/` - retrieve employee by ID
 - `PUT /api/employees/{id}/` - update employee
 - `PATCH /api/employees/{id}/` - partial update
@@ -52,7 +53,9 @@ Employee fields:
 - `full_name` (string)
 - `job_title` (string)
 - `country` (string)
-- `salary` (decimal)
+- `salary` (decimal, non-negative)
+
+> **Note:** salary is validated to be non-negative; attempts to save a negative value will raise a validation error.
 
 ### Salary Calculation
 
